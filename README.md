@@ -83,3 +83,96 @@ class RegularCustomer(Discount):
 class PremiumCustomer(Discount):
     def get_discount(self):
         return 20
+
+from datetime import date, timedelta
+
+
+class Book:
+    def __init__(self, book_id, title):
+        self.book_id = book_id
+        self.title = title
+        self.available = True
+
+
+class User:
+    def __init__(self, user_id, name):
+        self.user_id = user_id
+        self.name = name
+        self.borrowed_books = {}
+
+
+class Library:
+    def __init__(self):
+        self.books = {}
+        self.users = {}
+
+    def add_book(self, book):
+        self.books[book.book_id] = book
+
+    def add_user(self, user):
+        self.users[user.user_id] = user
+
+    def borrow_book(self, user_id, book_id):
+        user = self.users[user_id]
+        book = self.books[book_id]
+
+        if book.available:
+            book.available = False
+            due_date = date.today() + timedelta(days=7)
+            user.borrowed_books[book_id] = due_date
+
+            print(f"{user.name} borrowed '{book.title}'")
+            print(f"Due Date: {due_date}")
+        else:
+            print("Book is not available.")
+
+    def return_book(self, user_id, book_id):
+        user = self.users[user_id]
+        book = self.books[book_id]
+
+        due_date = user.borrowed_books[book_id]
+        return_date = date.today()
+
+        late_days = max(0, (return_date - due_date).days)
+        penalty = late_days * 10
+
+        book.available = True
+        del user.borrowed_books[book_id]
+
+        print(f"{user.name} returned '{book.title}'")
+        print(f"Late Days: {late_days}")
+        print(f"Penalty: ₹{penalty}")
+
+    def show_available_books(self):
+        print("\nAvailable Books:")
+        for book in self.books.values():
+            if book.available:
+                print(f"{book.book_id} - {book.title}")
+
+
+# Creating library
+library = Library()
+
+# Adding books
+library.add_book(Book("B101", "Python Programming"))
+library.add_book(Book("B102", "Data Structures"))
+library.add_book(Book("B103", "Machine Learning"))
+
+# Adding users
+library.add_user(User("U101", "Rahul"))
+library.add_user(User("U102", "Priya"))
+
+# Display available books
+library.show_available_books()
+
+# Borrow a book
+library.borrow_book("U101", "B101")
+
+# Display available books
+library.show_available_books()
+
+# Return the book
+library.return_book("U101", "B101")
+
+# Display final available books
+library.show_available_books()
