@@ -8,7 +8,7 @@ class Student:
 
     def add_marks(self, subject, marks):
         self.__marks[subject] = marks
-
+        
     def calculate_average(self):
         total = 0
 
